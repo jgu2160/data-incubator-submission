@@ -3,9 +3,6 @@ import random
 import copy
 
 def subsets(n):
-#def subsets():
-    #chain = [1,5,3,2,4]
-    #chain = [1,3,2,5,4]
     chain = random.sample(range(1, n+1), n)
     maxSubsetCount = 0
     subsetCount = 0
