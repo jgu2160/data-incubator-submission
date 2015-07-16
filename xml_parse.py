@@ -3,6 +3,7 @@ from scipy.stats.stats import pearsonr
 import re
 import numpy as np
 import operator
+from dateutil import parser
 
 def getFifthTag():
     xmldoc = minidom.parse('overflow/Tags.xml')
@@ -121,7 +122,52 @@ def getUpAvgByQA():
     meanA = np.mean(avgA, dtype=np.float64)
     print(meanA - meanQ)
 
+def getQWithAccepted():
+    xmldoc = minidom.parse('overflow/Posts.xml')
+    rows = xmldoc.getElementsByTagName('row')
+    timeQA = dict();
+    for row in rows:
+        typeID = int(row.attributes['PostTypeId'].value)
+        if typeID == 1:
+            qID = int(row.attributes['Id'].value)
+            try:
+                aID = int(row.attributes['AcceptedAnswerId'].value)
+                qTime = parser.parse(row.attributes['CreationDate'].value)
+                aTime = getAnswerTime(aID)
+                if aTime:
+                    aTime = parser.parse(getAnswerTime(aID))
+                    timeQA[qID] = [qTime, aTime]
+            except KeyError:
+                continue;
+    return timeQA
+
+def makeTimeBuckets():
+    timePairDict = getQWithAccepted()
+    bucketDict = dict()
+    for qID in timePairDict:
+        h = timePairDict[qID][0].hour
+        microDiff = float((timePairDict[qID][1] - timePairDict[qID][0]).microseconds)/3600000000
+        if h in bucketDict:
+            bucketDict[h].append(microDiff)
+        else:
+            bucketDict[h] = [microDiff]
+    for hour in bucketDict:
+        print hour
+        print np.median(bucketDict[hour])
+
+def getAnswerTime(id):
+    xmldoc = minidom.parse('overflow/Posts.xml')
+    rows = xmldoc.getElementsByTagName('row')
+    for row in rows:
+        postID = int(row.attributes['Id'].value)
+        if postID == id:
+            aTime = row.attributes['CreationDate'].value
+            return aTime
+
+
 #getAvgDiff()
 #getPosts()
 #getPearson()
-getUpAvgByQA()
+#getUpAvgByQA()
+#getQWithAccepted()
+makeTimeBuckets()
