@@ -1,0 +1,28 @@
+h1 {
+  font: 30px sans-serif;
+}
+
+.bar {
+  fill: steelblue;
+  transition: 0.5s;
+}
+
+.bar:hover {
+  fill: brown;
+  transition: 0.5s;
+}
+
+.axis {
+  font: 15px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
