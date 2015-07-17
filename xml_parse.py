@@ -123,6 +123,7 @@ def getUpAvgByQA():
     print(meanA - meanQ)
 
 def getQWithAccepted():
+    #xmldoc = minidom.parse('overflow/PostsFixture.xml')
     xmldoc = minidom.parse('overflow/Posts.xml')
     rows = xmldoc.getElementsByTagName('row')
     timeQA = dict();
@@ -132,10 +133,16 @@ def getQWithAccepted():
             qID = int(row.attributes['Id'].value)
             try:
                 aID = int(row.attributes['AcceptedAnswerId'].value)
+                aTime = False
+                try:
+                    answer = rows[aID - 1]
+                    aTime = answer.attributes['CreationDate'].value
+                except IndexError:
+                    print("Not found")
                 qTime = parser.parse(row.attributes['CreationDate'].value)
-                aTime = getAnswerTime(aID)
                 if aTime:
-                    aTime = parser.parse(getAnswerTime(aID))
+                    aTime = parser.parse(aTime)
+                    #print("(%s) A: %s Q: %s" % (qID, aTime, qTime))
                     timeQA[qID] = [qTime, aTime]
             except KeyError:
                 continue;
@@ -146,24 +153,17 @@ def makeTimeBuckets():
     bucketDict = dict()
     for qID in timePairDict:
         h = timePairDict[qID][0].hour
-        microDiff = float((timePairDict[qID][1] - timePairDict[qID][0]).microseconds)/3600000000
+        hourDiff = float((timePairDict[qID][1] - timePairDict[qID][0]).total_seconds())/3600
         if h in bucketDict:
-            bucketDict[h].append(microDiff)
+            bucketDict[h].append(hourDiff)
         else:
-            bucketDict[h] = [microDiff]
+            bucketDict[h] = [hourDiff]
+    sortedBucket = dict(sorted(bucketDict.items(), key=operator.itemgetter(1), reverse=True))
     for hour in bucketDict:
-        print hour
-        print np.median(bucketDict[hour])
-
-def getAnswerTime(id):
-    xmldoc = minidom.parse('overflow/Posts.xml')
-    rows = xmldoc.getElementsByTagName('row')
-    for row in rows:
-        postID = int(row.attributes['Id'].value)
-        if postID == id:
-            aTime = row.attributes['CreationDate'].value
-            return aTime
-
+        median = np.median(bucketDict[hour])
+        mini = np.amin(bucketDict[hour])
+        maxi = np.amax(bucketDict[hour])
+        print('median for %s: %.10f, min: %s, max: %s, length: %s' % (hour, median, mini, maxi, len(bucketDict[hour])))
 
 #getAvgDiff()
 #getPosts()
