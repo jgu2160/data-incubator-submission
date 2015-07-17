@@ -18,15 +18,16 @@ function getItems(err, result) {
     asins = items.map(function(item) {
         return item.ASIN;
     });
-    //console.log(asins);
+    console.log(asins);
     reviewOptions.ItemId = asins[2];
-    prodAdv.call("ItemLookup", reviewOptions, showReviews);
+    //prodAdv.call("ItemLookup", reviewOptions, showReviews);
 }
 
-function showReviews(err, result) {
-    firstThree = result.Items.Item.CustomerReviews.IFrameURL;
+//function showReviews(err, result) {
+    //firstThree = result.Items.Item.CustomerReviews.IFrameURL;
     //console.log(firstThree);
-}
+//}
+
 
 //prodAdv.call("ItemSearch", itemOptions, getItems);
 
