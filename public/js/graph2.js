@@ -1,4 +1,4 @@
-var data = [[4593, 0.0022], [6382, 0.000012], [4742,0.00018]];
+var data = [[4593, 0.000022], [6382, 0.00000012], [4742,0.0000018]];
 
     var margin = {top: 20, right: 15, bottom: 60, left: 60}
       , width = 960 - margin.left - margin.right
